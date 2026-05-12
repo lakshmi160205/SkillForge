@@ -1,0 +1,59 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  :where(.flex, .inline-flex, .grid) > * {
+    min-width: 0;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    color: #1e2a24;
+    background: lightgreen
+      
+       }
+   
+  h1,
+  h2,
+  h3 {
+    font-family: "Space Grotesk", "Segoe UI", sans-serif
+     }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a,
+  span,
+  small,
+  label,
+  li,
+  td,
+  th {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

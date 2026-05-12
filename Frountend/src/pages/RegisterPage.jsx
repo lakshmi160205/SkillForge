@@ -1,0 +1,90 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+
+export function RegisterPage() {
+  const navigate = useNavigate();
+  const { register, isLoading } = useAuth();
+
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    role: "STUDENT",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const onChange = (event) => {
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+  };
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      await register(form);
+      setSuccess("Registration successful. Please login.");
+      setTimeout(() => navigate("/login"), 800);
+    } catch (err) {
+      setError(err.response?.data?.message || "Unable to register");
+    }
+  };
+
+  return (
+    <section className="grid place-items-center">
+      <form className="grid w-full max-w-xl gap-3 rounded-2xl border border-emerald-100 bg-white p-6 shadow-lg shadow-emerald-950/5" onSubmit={onSubmit}>
+        <h2 className="text-2xl font-bold text-slate-900">Create account</h2>
+
+        <label className="grid gap-1 text-sm font-semibold text-slate-700">
+          First name
+          <input className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring" name="firstName" value={form.firstName} onChange={onChange} required />
+        </label>
+
+        <label className="grid gap-1 text-sm font-semibold text-slate-700">
+          Last name
+          <input className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring" name="lastName" value={form.lastName} onChange={onChange} />
+        </label>
+
+        <label className="grid gap-1 text-sm font-semibold text-slate-700">
+          Email
+          <input className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring" name="email" type="email" value={form.email} onChange={onChange} required />
+        </label>
+
+        <label className="grid gap-1 text-sm font-semibold text-slate-700">
+          Password
+          <input
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={onChange}
+            required
+          />
+        </label>
+
+        <label className="grid gap-1 text-sm font-semibold text-slate-700">
+          Role
+          <select className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring" name="role" value={form.role} onChange={onChange}>
+            <option value="STUDENT">Student</option>
+            <option value="INSTRUCTOR">Instructor</option>
+          </select>
+        </label>
+
+        {error && <p className="font-semibold text-red-700">{error}</p>}
+        {success && <p className="font-semibold text-green-700">{success}</p>}
+
+        <button type="submit" className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70" disabled={isLoading}>
+          {isLoading ? "Creating..." : "Create account"}
+        </button>
+
+        <p className="text-sm text-slate-500">
+          Already have account? <Link className="font-semibold text-emerald-700" to="/login">Login</Link>
+        </p>
+      </form>
+    </section>
+  );
+}
