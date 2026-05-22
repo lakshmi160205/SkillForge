@@ -73,6 +73,10 @@ const courseSchema = new Schema(
       type: Number,
       default: 0,
       min: [0, "Price cannot be negative"],
+      set: (value) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      },
     },
     thumbnailUrl: {
       type: String,

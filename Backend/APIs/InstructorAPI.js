@@ -45,6 +45,11 @@ const upload = multer({
   },
 });
 
+const coerceNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
 instructorRoute.use(verifyToken, authorizeRoles("INSTRUCTOR"));
 
 instructorRoute.post("/uploads/thumbnail", upload.single("thumbnail"), async (req, res, next) => {
@@ -79,7 +84,11 @@ instructorRoute.post("/courses", async (req, res, next) => {
     const courseDoc = new CourseModel({
       ...req.body,
       instructorId: req.user.userId,
-      lectures: req.body.lectures || [],
+      price: coerceNumber(req.body.price, 0),
+      lectures: (req.body.lectures || []).map((lecture) => ({
+        ...lecture,
+        durationInSeconds: coerceNumber(lecture.durationInSeconds, 0),
+      })),
     });
 
     const newCourse = await courseDoc.save();
@@ -165,9 +174,20 @@ instructorRoute.get("/dashboard", async (req, res, next) => {
 
 instructorRoute.patch("/courses/:courseId", async (req, res, next) => {
   try {
+    const updatePayload = { ...req.body };
+    if (updatePayload.price !== undefined) {
+      updatePayload.price = coerceNumber(updatePayload.price, 0);
+    }
+    if (Array.isArray(updatePayload.lectures)) {
+      updatePayload.lectures = updatePayload.lectures.map((lecture) => ({
+        ...lecture,
+        durationInSeconds: coerceNumber(lecture.durationInSeconds, 0),
+      }));
+    }
+
     const updatedCourse = await CourseModel.findOneAndUpdate(
       { _id: req.params.courseId, instructorId: req.user.userId },
-      req.body,
+      updatePayload,
       { new: true, runValidators: true },
     );
 

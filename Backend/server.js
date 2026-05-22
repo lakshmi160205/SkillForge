@@ -13,6 +13,7 @@ import { adminRoute } from "./APIs/AdminAPI.js";
 import { commonRouter } from "./APIs/commonapi.js";
 import { videoRoute } from "./APIs/videoAPI.js";
 import { paymentRoute } from "./APIs/paymentAPI.js";
+import cartRoutes from "./APIs/CartAPI.js";
 
 config();
 
@@ -54,6 +55,7 @@ app.use("/admin-api", adminRoute);
 app.use("/common-api", commonRouter);
 app.use("/video-api", videoRoute);
 app.use("/payment-api", paymentRoute);
+app.use("/student-api/cart", cartRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: `${req.url} is an invalid path` });

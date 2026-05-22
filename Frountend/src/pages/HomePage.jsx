@@ -1,8 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 import { api } from "../services/api.js";
 
+const dashboardPathByRole = {
+  STUDENT: "/student/dashboard",
+  INSTRUCTOR: "/instructor/dashboard",
+  ADMIN: "/admin/dashboard",
+};
+
 export function HomePage() {
+  const navigate = useNavigate();
+  const { isAuthenticated, role } = useAuth();
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -52,13 +61,18 @@ export function HomePage() {
             </p>
 
             <div className="flex flex-wrap gap-3">
-              <Link
+              <button
+                type="button"
+                onClick={() => {
+                  const redirectPath = isAuthenticated
+                    ? dashboardPathByRole[role] || "/login"
+                    : "/login";
+                  navigate(redirectPath);
+                }}
                 className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
-                to="/register"
               >
                 Start learning
-              </Link>
-              
+              </button>
             </div>
 
             <div className="relative max-w-2xl">

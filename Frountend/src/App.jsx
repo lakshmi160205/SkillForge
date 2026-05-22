@@ -11,6 +11,7 @@ import { RegisterPage } from "./pages/RegisterPage.jsx";
 import { StudentDashboardPage } from "./pages/StudentDashboardPage.jsx";
 import { StudentCourseLecturesPage } from "./pages/StudentCourseLecturesPage.jsx";
 import { StudentTransactionsPage } from "./pages/StudentTransactionsPage.jsx";
+import CartPage from "./pages/CartPage.jsx";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
         <Route path="/courses/:courseId" element={<CourseDetailsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
+        <Route path="/cart" element={<CartPage />}/>
         <Route
           path="/student/dashboard"
           element={

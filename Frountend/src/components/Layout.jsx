@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-
+// import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 const dashboardPathByRole = {
   STUDENT: "/student/dashboard",
   INSTRUCTOR: "/instructor/dashboard",
@@ -9,6 +10,7 @@ const dashboardPathByRole = {
 
 export function Layout({ children }) {
   const navigate = useNavigate();
+  const { cart } = useCart();
   const { isAuthenticated, role, user, logout } = useAuth();
   const currentYear = new Date().getFullYear();
 
@@ -61,7 +63,7 @@ export function Layout({ children }) {
           )}
         </nav>
 
-       
+          <Link to="/cart">🛒 {cart.length}</Link>
           {isAuthenticated ? (
             <>
               <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">

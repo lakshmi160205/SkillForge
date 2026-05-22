@@ -19,6 +19,7 @@ export function InstructorCourseDetailsPage() {
   const [lectureForm, setLectureForm] = useState(initialLectureForm);
   const [lectureVideoFile, setLectureVideoFile] = useState(null);
   const [isUploadingLectureVideo, setIsUploadingLectureVideo] = useState(false);
+  const [isPublishingCourse, setIsPublishingCourse] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -55,7 +56,14 @@ export function InstructorCourseDetailsPage() {
     const { name, type, value, checked } = event.target;
     setLectureForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : name === "durationInSeconds" ? Number(value) : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : name === "durationInSeconds"
+          ? value === ""
+            ? ""
+            : Number(value)
+          : value,
     }));
   };
 
@@ -127,6 +135,7 @@ export function InstructorCourseDetailsPage() {
         title: lectureForm.title.trim(),
         description: lectureForm.description.trim(),
         videoUrl: lectureForm.videoUrl.trim(),
+        durationInSeconds: Number(lectureForm.durationInSeconds) || 0,
         order,
       });
 
@@ -158,6 +167,24 @@ export function InstructorCourseDetailsPage() {
     }
   };
 
+  const onPublishCourse = async () => {
+    if (!course) return;
+
+    setError("");
+    setMessage("");
+    setIsPublishingCourse(true);
+
+    try {
+      await api.updateCourse(courseId, { isPublished: true });
+      setMessage("Course published successfully");
+      await loadCourse();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to publish course");
+    } finally {
+      setIsPublishingCourse(false);
+    }
+  };
+
   if (loading) {
     return <p>Loading course...</p>;
   }
@@ -169,12 +196,29 @@ export function InstructorCourseDetailsPage() {
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">{course?.title || "Course"}</h1>
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold text-slate-900">{course?.title || "Course"}</h1>
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${course?.isPublished ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"}`}>
+              {course?.isPublished ? "Published" : "Draft"}
+            </span>
+          </div>
           <p className="text-sm text-slate-500">Manage lecture content for this course.</p>
         </div>
 
-        <Link
+        <div className="flex flex-wrap items-center gap-3">
+          {!course?.isPublished && (
+            <button
+              type="button"
+              disabled={isPublishingCourse}
+              onClick={onPublishCourse}
+              className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-emerald-300"
+            >
+              {isPublishingCourse ? "Publishing…" : "Publish Course"}
+            </button>
+          )}
+
+          <Link
           to="/instructor/dashboard"
           className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
         >
@@ -333,6 +377,7 @@ export function InstructorCourseDetailsPage() {
           <p className="rounded-xl bg-slate-50 p-4 text-slate-600">No reviews yet for this course.</p>
         )}
       </article>
+      </div>
     </section>
   );
 }

@@ -4,6 +4,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { CheckoutForm } from "../components/CheckoutForm.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useCart } from "../context/CartContext.jsx";
 import { api } from "../services/api.js";
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
@@ -11,11 +12,15 @@ const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : 
 
 export function CourseDetailsPage() {
   const { courseId } = useParams();
+  const { cart, addToCart } = useCart();
   const navigate = useNavigate();
-  const { role } = useAuth();
+  const { role, isAuthenticated } = useAuth();
+  const canUseCart = isAuthenticated && role === "STUDENT";
+  const needsLogin = !isAuthenticated;
 
   const [courseData, setCourseData] = useState(null);
   const [message, setMessage] = useState("");
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [actionError, setActionError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -130,6 +135,35 @@ export function CourseDetailsPage() {
     });
   };
 
+  const onAddCourseToCart = async () => {
+    if (!course) return;
+    if (needsLogin) {
+      setActionError("Please log in as a student before adding this course to cart.");
+      return;
+    }
+    if (!canUseCart) {
+      setActionError("Only students can add courses to the cart.");
+      return;
+    }
+    if (isInCart) {
+      setMessage("Course is already in your cart.");
+      return;
+    }
+
+    setActionError("");
+    setMessage("");
+    setIsAddingToCart(true);
+
+    try {
+      await addToCart(course._id);
+      setMessage("Course added to cart.");
+    } catch (err) {
+      setActionError(err.response?.data?.message || "Failed to add course to cart");
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
   const goToCourseLectures = () => {
     navigate(`/student/courses/${courseId}/lectures`);
   };
@@ -147,6 +181,7 @@ export function CourseDetailsPage() {
   }
 
   const { course, reviews } = courseData;
+  const isInCart = Boolean(cart?.some((item) => item.course?._id === course?._id));
   const lectureCount = course.lectures?.length || 0;
   const previewCount = course.lectures?.filter((lecture) => lecture.isPreview).length || 0;
   const reviewCount = reviews?.length || 0;
@@ -180,9 +215,37 @@ export function CourseDetailsPage() {
                 <span className="rounded-full bg-white/12 px-3 py-1.5 backdrop-blur-sm">{lectureCount} lectures</span>
                 <span className="rounded-full bg-white/12 px-3 py-1.5 backdrop-blur-sm">{course.averageRating || 0}/5 rating</span>
               </div>
-
               {message && <p className="font-semibold text-emerald-100">{message}</p>}
               {actionError && <p className="font-semibold text-amber-100">{actionError}</p>}
+            </div>
+
+            <div>
+              {needsLogin ? (
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  className="w-full rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                >
+                  Login to add to cart
+                </button>
+              ) : canUseCart ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={onAddCourseToCart}
+                    disabled={isAddingToCart || isInCart}
+                    className="w-full rounded-2xl border border-emerald-200 bg-white px-5 py-3 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                  >
+                    {isInCart ? "Already in cart" : isAddingToCart ? "Adding to cart..." : "Add to cart"}
+                  </button>
+                  {message && <p className="mt-3 text-sm font-semibold text-emerald-700">{message}</p>}
+                  {actionError && <p className="mt-3 text-sm font-semibold text-amber-800">{actionError}</p>}
+                </>
+              ) : (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                  Add to cart is available for students only.
+                </div>
+              )}
             </div>
 
             <div className="rounded-[1.75rem] bg-white/12 p-5 backdrop-blur-md">

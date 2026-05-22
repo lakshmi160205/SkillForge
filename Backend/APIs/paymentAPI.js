@@ -50,27 +50,44 @@ paymentRoute.post("/create-order", async (req, res, next) => {
       return res.status(500).json({ message: "Stripe is not configured on server" });
     }
 
-    const { courseId } = req.body;
+    const { courseId, courseIds } = req.body;
     const studentId = req.user.userId;
 
-    const course = await CourseModel.findById(courseId);
-    if (!course || !course.isPublished) {
-      return res.status(404).json({ message: "Published course not found" });
-    }
+    let paymentCourses;
+    let paymentAmount;
+    let paymentCourseId;
 
-    if (course.price <= 0) {
-      return res.status(400).json({ message: "This course is free. Use enrollment directly." });
-    }
-
-    const existingEnrollment = await EnrollmentModel.findOne({ studentId, courseId });
-    if (existingEnrollment && existingEnrollment.paymentStatus === "PAID") {
-      return res.status(200).json({
-        message: "Student already enrolled in this course",
-        payload: existingEnrollment,
+    if (Array.isArray(courseIds) && courseIds.length > 0) {
+      paymentCourses = await CourseModel.find({
+        _id: { $in: courseIds },
+        isPublished: true,
       });
+
+      if (paymentCourses.length !== courseIds.length) {
+        return res.status(404).json({ message: "One or more published paid courses not found" });
+      }
+
+      paymentAmount = paymentCourses.reduce((total, course) => total + (Number(course.price) || 0), 0);
+      paymentCourseId = courseIds[0];
+    } else {
+      paymentCourses = [];
+      paymentCourseId = courseId;
+      const course = await CourseModel.findById(courseId);
+      if (!course || !course.isPublished) {
+        return res.status(404).json({ message: "Published course not found" });
+      }
+      if (Number(course.price) <= 0) {
+        return res.status(400).json({ message: "This course is free. Use enrollment directly." });
+      }
+      paymentCourses = [course];
+      paymentAmount = Number(course.price) || 0;
     }
 
-    const amountInPaise = Math.round(course.price * 100);
+    if (paymentAmount <= 0) {
+      return res.status(400).json({ message: "No payable courses found" });
+    }
+
+    const amountInPaise = Math.round(paymentAmount * 100);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInPaise,
@@ -81,15 +98,16 @@ paymentRoute.post("/create-order", async (req, res, next) => {
       },
       metadata: {
         studentId: studentId.toString(),
-        courseId: courseId.toString(),
+        courseId: paymentCourseId.toString(),
+        courseIds: JSON.stringify(courseIds || [paymentCourseId]),
       },
     });
 
     await PaymentModel.create({
       studentId,
-      courseId,
+      courseId: paymentCourseId,
       orderId: paymentIntent.id,
-      amount: course.price,
+      amount: paymentAmount,
       currency: "INR",
       status: "PENDING",
     });
@@ -111,16 +129,26 @@ paymentRoute.post("/verify", async (req, res, next) => {
       return res.status(500).json({ message: "Stripe is not configured on server" });
     }
 
-    const { paymentIntentId, courseId } = req.body;
+    const { paymentIntentId, courseId, courseIds } = req.body;
     const studentId = req.user.userId;
 
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
-    const matchesCourse = paymentIntent.metadata?.courseId === courseId;
+    const intentCourseIds = paymentIntent.metadata?.courseIds
+      ? JSON.parse(paymentIntent.metadata.courseIds)
+      : [paymentIntent.metadata?.courseId];
     const matchesStudent = paymentIntent.metadata?.studentId === String(studentId);
 
-    if (!matchesCourse || !matchesStudent) {
+    if (!matchesStudent) {
       return res.status(400).json({ message: "Payment intent does not match this enrollment" });
+    }
+
+    const isSingleCourse = !Array.isArray(courseIds) || courseIds.length === 0;
+    if (isSingleCourse && paymentIntent.metadata?.courseId !== courseId) {
+      return res.status(400).json({ message: "Payment intent does not match this enrollment" });
+    }
+    if (!isSingleCourse && JSON.stringify(intentCourseIds) !== JSON.stringify(courseIds)) {
+      return res.status(400).json({ message: "Payment intent does not match this batch enrollment" });
     }
 
     if (paymentIntent.status !== "succeeded") {
@@ -138,12 +166,20 @@ paymentRoute.post("/verify", async (req, res, next) => {
       },
     );
 
-    const enrollment = await markEnrollmentPaid({ studentId, courseId });
+    const coursesToEnroll = courseIds && Array.isArray(courseIds) && courseIds.length > 0
+      ? courseIds
+      : [courseId];
+
+    const enrollmentResults = [];
+    for (const courseToEnroll of coursesToEnroll) {
+      const enrollment = await markEnrollmentPaid({ studentId, courseId: courseToEnroll });
+      enrollmentResults.push(enrollment);
+    }
 
     res.status(200).json({
       message: "Payment successful and enrollment completed",
       success: true,
-      payload: enrollment,
+      payload: enrollmentResults,
     });
   } catch (err) {
     next(err);
@@ -157,12 +193,13 @@ paymentRoute.post("/retry-verify", async (req, res, next) => {
       return res.status(500).json({ message: "Stripe is not configured on server" });
     }
 
-    const { courseId } = req.body;
+    const { courseId, courseIds } = req.body;
     const studentId = req.user.userId;
+    const targetCourseId = Array.isArray(courseIds) && courseIds.length > 0 ? courseIds[0] : courseId;
 
     const latestPayment = await PaymentModel.findOne({
       studentId,
-      courseId,
+      courseId: targetCourseId,
       status: { $in: ["PENDING", "SUCCESS"] },
     }).sort({ createdAt: -1 });
 
@@ -171,21 +208,35 @@ paymentRoute.post("/retry-verify", async (req, res, next) => {
     }
 
     if (latestPayment.status === "SUCCESS") {
-      const enrollment = await markEnrollmentPaid({ studentId, courseId });
+      const coursesToEnroll = Array.isArray(courseIds) && courseIds.length > 0 ? courseIds : [courseId];
+      const enrollmentResults = [];
+      for (const courseToEnroll of coursesToEnroll) {
+        const enrollment = await markEnrollmentPaid({ studentId, courseId: courseToEnroll });
+        enrollmentResults.push(enrollment);
+      }
       return res.status(200).json({
         message: "Payment already successful. Enrollment synced.",
         success: true,
-        payload: enrollment,
+        payload: enrollmentResults,
       });
     }
 
     const paymentIntent = await stripe.paymentIntents.retrieve(latestPayment.orderId);
 
-    const matchesCourse = paymentIntent.metadata?.courseId === String(courseId);
+    const intentCourseIds = paymentIntent.metadata?.courseIds
+      ? JSON.parse(paymentIntent.metadata.courseIds)
+      : [paymentIntent.metadata?.courseId];
     const matchesStudent = paymentIntent.metadata?.studentId === String(studentId);
 
-    if (!matchesCourse || !matchesStudent) {
+    const isSingleCourse = !Array.isArray(courseIds) || courseIds.length === 0;
+    if (!matchesStudent) {
       return res.status(400).json({ message: "Payment intent does not match this enrollment" });
+    }
+    if (isSingleCourse && paymentIntent.metadata?.courseId !== String(courseId)) {
+      return res.status(400).json({ message: "Payment intent does not match this enrollment" });
+    }
+    if (!isSingleCourse && JSON.stringify(intentCourseIds) !== JSON.stringify(courseIds)) {
+      return res.status(400).json({ message: "Payment intent does not match this batch enrollment" });
     }
 
     if (paymentIntent.status !== "succeeded") {

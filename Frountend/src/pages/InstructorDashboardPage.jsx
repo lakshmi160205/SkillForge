@@ -32,6 +32,7 @@ export function InstructorDashboardPage() {
   const [isUploadingLectureVideo, setIsUploadingLectureVideo] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
+  const [publishingCourseId, setPublishingCourseId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -54,10 +55,17 @@ export function InstructorDashboardPage() {
   }, []);
 
   const onChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, valueAsNumber } = event.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === "price" ? Number(value) : value,
+      [name]:
+        name === "price"
+          ? value === ""
+            ? ""
+            : Number.isFinite(valueAsNumber)
+            ? valueAsNumber
+            : Number(value)
+          : value,
     }));
   };
 
@@ -65,7 +73,14 @@ export function InstructorDashboardPage() {
     const { name, type, value, checked } = event.target;
     setLectureForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : name === "durationInSeconds" ? Number(value) : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : name === "durationInSeconds"
+          ? value === ""
+            ? ""
+            : Number(value)
+          : value,
     }));
   };
 
@@ -189,7 +204,15 @@ export function InstructorDashboardPage() {
     setMessage("");
 
     try {
-      await api.createCourse(form);
+      const payload = {
+        ...form,
+        price: Number(form.price) || 0,
+        lectures: form.lectures.map((l) => ({
+          ...l,
+          durationInSeconds: Number(l.durationInSeconds) || 0,
+        })),
+      };
+      await api.createCourse(payload);
       setMessage("Course created successfully");
       setForm(initialForm);
       setLectureForm(initialLectureForm);
@@ -201,6 +224,22 @@ export function InstructorDashboardPage() {
       await loadDashboard();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create course");
+    }
+  };
+
+  const onPublishCourse = async (courseId) => {
+    setError("");
+    setMessage("");
+    setPublishingCourseId(courseId);
+
+    try {
+      await api.updateCourse(courseId, { isPublished: true });
+      setMessage("Course published successfully");
+      await loadDashboard();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to publish course");
+    } finally {
+      setPublishingCourseId(null);
     }
   };
 
@@ -285,7 +324,16 @@ export function InstructorDashboardPage() {
 
           <label className="grid gap-1 text-sm font-semibold text-slate-700">
             Price
-            <input className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring" name="price" type="number" value={form.price} onChange={onChange} min="0" />
+            <input
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
+              name="price"
+              type="number"
+              value={form.price}
+              onChange={onChange}
+              min="0"
+              step="1"
+              inputMode="numeric"
+            />
           </label>
         </div>
 
@@ -489,58 +537,75 @@ export function InstructorDashboardPage() {
       <h3 className="mt-6 text-lg font-semibold text-slate-800">Drafts</h3>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{
         (dashboard?.courses || []).filter((c) => !c.isPublished).map((course) => (
-          <Link
+          <article
             key={course._id}
-            to={`/instructor/courses/${course._id}`}
             className="grid min-w-0 gap-3 overflow-hidden rounded-2xl border border-amber-100 bg-white p-4 shadow-lg shadow-emerald-950/5 transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-xl"
           >
-            {course.thumbnailUrl ? (
-              <img
-                src={course.thumbnailUrl}
-                alt={`${course.title} thumbnail`}
-                className="h-36 w-full rounded-xl object-cover"
-              />
-            ) : (
-              <div className="grid h-36 w-full place-items-center rounded-xl bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                No Thumbnail
+            <Link
+              to={`/instructor/courses/${course._id}`}
+              className="grid min-w-0 gap-3"
+            >
+              {course.thumbnailUrl ? (
+                <img
+                  src={course.thumbnailUrl}
+                  alt={`${course.title} thumbnail`}
+                  className="h-36 w-full rounded-xl object-cover"
+                />
+              ) : (
+                <div className="grid h-36 w-full place-items-center rounded-xl bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  No Thumbnail
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-1.5">
+                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{course.category || "Uncategorized"}</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">{course.level || "—"}</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${course.isPublished ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"}`}>
+                  {course.isPublished ? "Published" : "Draft"}
+                </span>
               </div>
-            )}
 
-            <div className="flex flex-wrap gap-1.5">
-              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{course.category || "Uncategorized"}</span>
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">{course.level || "—"}</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${course.isPublished ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"}`}>
-                {course.isPublished ? "Published" : "Draft"}
-              </span>
-            </div>
-
-            <div>
-              <h3 className="break-all text-base font-bold text-slate-900">{course.title}</h3>
-              {course.subtitle && <p className="mt-0.5 break-all text-xs text-slate-500">{course.subtitle}</p>}
-            </div>
-
-            <p className="line-clamp-2 break-all text-xs leading-5 text-slate-600">{course.description}</p>
-
-            <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3 text-center text-xs">
               <div>
-                <p className="font-bold text-emerald-800">{course.totalEnrollments || 0}</p>
-                <p className="text-slate-500">Students</p>
+                <h3 className="break-all text-base font-bold text-slate-900">{course.title}</h3>
+                {course.subtitle && <p className="mt-0.5 break-all text-xs text-slate-500">{course.subtitle}</p>}
               </div>
-              <div>
-                <p className="font-bold text-emerald-800">{course.averageRating || 0} / 5</p>
-                <p className="text-slate-500">Rating</p>
-              </div>
-              <div>
-                <p className="font-bold text-emerald-800">{course.price > 0 ? `Rs.${course.price}` : "Free"}</p>
-                <p className="text-slate-500">Price</p>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>{course.language || "English"}</span>
-              <span>{course.lectures?.length || 0} lecture{course.lectures?.length !== 1 ? "s" : ""}</span>
-            </div>
-          </Link>
+              <p className="line-clamp-2 break-all text-xs leading-5 text-slate-600">{course.description}</p>
+
+              <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3 text-center text-xs">
+                <div>
+                  <p className="font-bold text-emerald-800">{course.totalEnrollments || 0}</p>
+                  <p className="text-slate-500">Students</p>
+                </div>
+                <div>
+                  <p className="font-bold text-emerald-800">{course.averageRating || 0} / 5</p>
+                  <p className="text-slate-500">Rating</p>
+                </div>
+                <div>
+                  <p className="font-bold text-emerald-800">{course.price > 0 ? `Rs.${course.price}` : "Free"}</p>
+                  <p className="text-slate-500">Price</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>{course.language || "English"}</span>
+                <span>{course.lectures?.length || 0} lecture{course.lectures?.length !== 1 ? "s" : ""}</span>
+              </div>
+            </Link>
+
+            <button
+              type="button"
+              disabled={publishingCourseId === course._id}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onPublishCourse(course._id);
+              }}
+              className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-emerald-300"
+            >
+              {publishingCourseId === course._id ? "Publishing…" : "Publish Course"}
+            </button>
+          </article>
         ))
       }</div>
 

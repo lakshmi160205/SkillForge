@@ -31,10 +31,12 @@ export const api = {
   getStudentDashboard: () => apiClient.get("/student-api/dashboard"),
   getStudentCourseProgress: (courseId) => apiClient.get(`/student-api/courses/${courseId}/progress`),
   enrollCourse: (courseId) => apiClient.post(`/student-api/courses/${courseId}/enroll`),
-  createPaymentOrder: (courseId) => apiClient.post("/payment-api/create-order", { courseId }),
-  verifyPayment: (paymentIntentId, courseId) =>
-    apiClient.post("/payment-api/verify", { paymentIntentId, courseId }),
-  retryVerifyPayment: (courseId) => apiClient.post("/payment-api/retry-verify", { courseId }),
+  createPaymentOrder: (courseId, courseIds) =>
+    apiClient.post("/payment-api/create-order", { courseId, courseIds }),
+  verifyPayment: (paymentIntentId, courseId, courseIds) =>
+    apiClient.post("/payment-api/verify", { paymentIntentId, courseId, courseIds }),
+  retryVerifyPayment: (courseId, courseIds) =>
+    apiClient.post("/payment-api/retry-verify", { courseId, courseIds }),
   getMyPayments: () => apiClient.get("/payment-api/my-payments"),
   submitCourseReview: (courseId, payload) =>
     apiClient.post(`/student-api/courses/${courseId}/reviews`, payload),
@@ -46,8 +48,11 @@ export const api = {
   getInstructorCourseById: (courseId) => apiClient.get(`/instructor-api/courses/${courseId}`),
   getInstructorCourseReviews: (courseId) => apiClient.get(`/instructor-api/courses/${courseId}/reviews`),
   createCourse: (payload) => apiClient.post("/instructor-api/courses", payload),
+  updateCourse: (courseId, payload) => apiClient.patch(`/instructor-api/courses/${courseId}`, payload),
   addLectureToCourse: (courseId, payload) =>
     apiClient.post(`/instructor-api/courses/${courseId}/lectures`, payload),
+  updateLecture: (courseId, lectureId, payload) =>
+    apiClient.patch(`/instructor-api/courses/${courseId}/lectures/${lectureId}`, payload),
   deleteLectureFromCourse: (courseId, lectureId) =>
     apiClient.delete(`/instructor-api/courses/${courseId}/lectures/${lectureId}`),
   uploadCourseThumbnail: (file) => {
@@ -70,4 +75,6 @@ export const api = {
   getUsers: () => apiClient.get("/admin-api/users"),
   updateUserStatus: (userId, isActive) =>
     apiClient.patch(`/admin-api/users/${userId}/status`, { isActive }),
+  getStudentDetails: (studentId) => apiClient.get(`/admin-api/students/${studentId}/details`),
+  getInstructorDetails: (instructorId) => apiClient.get(`/admin-api/instructors/${instructorId}/details`),
 };

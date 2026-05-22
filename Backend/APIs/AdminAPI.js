@@ -5,6 +5,7 @@ import { UserTypeModel } from "../models/UserModel.js";
 import { CourseModel } from "../models/CourseModel.js";
 import { EnrollmentModel } from "../models/EnrollmentModel.js";
 import { ReviewModel } from "../models/ReviewModel.js";
+import { PaymentModel } from "../models/PaymentModel.js";
 
 export const adminRoute = exp.Router();
 
@@ -69,6 +70,62 @@ adminRoute.get("/courses", async (req, res, next) => {
       .sort({ createdAt: -1 });
 
     res.status(200).json({ message: "Courses fetched", payload: courses });
+  } catch (err) {
+    next(err);
+  }
+});
+
+adminRoute.get("/students/:studentId/details", async (req, res, next) => {
+  try {
+    const student = await UserTypeModel.findById(req.params.studentId).select("-password");
+    if (!student || student.role !== "STUDENT") {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const payments = await PaymentModel.find({ studentId: req.params.studentId })
+      .populate("courseId", "title price")
+      .sort({ createdAt: -1 });
+
+    const totalAmountPaid = payments
+      .filter((p) => p.status === "SUCCESS")
+      .reduce((sum, p) => sum + p.amount, 0);
+
+    res.status(200).json({
+      message: "Student details fetched",
+      payload: { student, payments, totalAmountPaid },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+adminRoute.get("/instructors/:instructorId/details", async (req, res, next) => {
+  try {
+    const instructor = await UserTypeModel.findById(req.params.instructorId).select("-password");
+    if (!instructor || instructor.role !== "INSTRUCTOR") {
+      return res.status(404).json({ message: "Instructor not found" });
+    }
+
+    const courses = await CourseModel.find({ instructorId: req.params.instructorId });
+
+    const coursesWithEnrollments = await Promise.all(
+      courses.map(async (course) => {
+        const enrollmentCount = await EnrollmentModel.countDocuments({ courseId: course._id });
+        return {
+          ...course.toObject(),
+          enrollmentCount,
+        };
+      }),
+    );
+
+    const totalEarnings = coursesWithEnrollments.reduce((sum, course) => {
+      return sum + course.price * course.enrollmentCount;
+    }, 0);
+
+    res.status(200).json({
+      message: "Instructor details fetched",
+      payload: { instructor, courses: coursesWithEnrollments, totalEarnings },
+    });
   } catch (err) {
     next(err);
   }

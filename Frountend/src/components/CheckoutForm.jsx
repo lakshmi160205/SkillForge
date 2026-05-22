@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { api } from "../services/api.js";
 
-export function CheckoutForm({ courseId, amount, courseName, onSuccess, onCancel }) {
+export function CheckoutForm({ courseId, courseIds, amount, courseName, onSuccess, onCancel }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export function CheckoutForm({ courseId, amount, courseName, onSuccess, onCancel
     setError("");
 
     try {
-      const { data } = await api.createPaymentOrder(courseId);
+      const { data } = await api.createPaymentOrder(courseId, courseIds);
 
       // If the API indicates the student is already enrolled, close modal and refresh state.
       if (data?.payload) {
@@ -42,15 +42,15 @@ export function CheckoutForm({ courseId, amount, courseName, onSuccess, onCancel
 
       let verifyResponse;
       try {
-        verifyResponse = await api.verifyPayment(paymentIntentId, courseId);
+        verifyResponse = await api.verifyPayment(paymentIntentId, courseId, courseIds);
       } catch {
         // A short retry avoids leaving users stuck in pending due to transient failures.
         await new Promise((resolve) => setTimeout(resolve, 1200));
         try {
-          verifyResponse = await api.verifyPayment(paymentIntentId, courseId);
+          verifyResponse = await api.verifyPayment(paymentIntentId, courseId, courseIds);
         } catch {
           // Final fallback sync checks latest payment state and updates enrollment if possible.
-          verifyResponse = await api.retryVerifyPayment(courseId);
+          verifyResponse = await api.retryVerifyPayment(courseId, courseIds);
         }
       }
 
