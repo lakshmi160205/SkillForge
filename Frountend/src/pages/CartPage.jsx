@@ -132,17 +132,18 @@ const CartPage = () => {
   };
 
   return (
-    <section className="space-y-6 px-4 py-5">
-      <div className="flex flex-col gap-3 rounded-3xl border border-emerald-100 bg-white p-6 shadow-lg shadow-emerald-950/5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">My Cart</h1>
-          <p className="text-sm text-slate-500">Review your selected courses and complete purchase from here.</p>
+    <section className="space-y-6 py-4">
+      <div className="grid gap-4 rounded-4xl border border-emerald-100 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] md:grid-cols-[1fr_auto] md:items-center">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800">Cart Summary</p>
+          <h1 className="text-3xl font-bold text-slate-900">Ready to complete your learning bundle</h1>
+          <p className="text-sm text-slate-500">Review your selected courses and check out securely.</p>
         </div>
         <div className="grid gap-2 sm:auto-cols-fr sm:grid-flow-col">
-          <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-800">
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-800">
             {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
           </div>
-          <div className="rounded-2xl bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-700">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-700">
             Total: Rs.{totalPrice}
           </div>
           {cartItems.length > 0 && (
@@ -150,7 +151,7 @@ const CartPage = () => {
               type="button"
               onClick={openBuyAllConfirm}
               disabled={isBuyingAll}
-              className="rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+              className="sf-btn-primary rounded-2xl px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               {isBuyingAll ? "Processing..." : "Buy All Courses"}
             </button>
@@ -176,7 +177,7 @@ const CartPage = () => {
       ) : (
         <div className="grid gap-4">
           {cartItems.map((item) => (
-            <div key={item.course?._id || item._id} className="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-[1fr_auto]">
+            <div key={item.course?._id || item._id} className="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.06)] sm:grid-cols-[1fr_auto]">
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="text-xl font-bold text-slate-900">{item.course?.title || "Course"}</h2>
@@ -195,11 +196,20 @@ const CartPage = () => {
                     <button
                       type="button"
                       onClick={() => openCheckout(item.course)}
-                      className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                      className="sf-btn-primary rounded-2xl px-4 py-2 text-sm font-semibold transition"
                     >
                       Purchase now
                     </button>
-                  ) : null}
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleEnrollFree(item.course?._id || item._id)}
+                      disabled={isEnrollingFree}
+                      className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isEnrollingFree ? "Enrolling..." : "Enroll free"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => removeFromCart(item.course?._id || item._id)}
@@ -217,7 +227,7 @@ const CartPage = () => {
       {/* Buy All Confirmation Dialog */}
       {isBuyAllConfirmOpen && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/60 px-4 py-10 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-4xl bg-white p-6 shadow-2xl">
             <div className="mb-6 space-y-4">
               <h3 className="text-2xl font-bold text-slate-900">Confirm Purchase</h3>
               <p className="text-sm text-slate-600">
@@ -250,7 +260,7 @@ const CartPage = () => {
                 type="button"
                 onClick={handleBuyAllCourses}
                 disabled={isBuyingAll}
-                className="flex-1 rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="sf-btn-primary flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 {isBuyingAll ? "Processing..." : "Yes, Buy All"}
               </button>
@@ -262,7 +272,7 @@ const CartPage = () => {
       {/* Individual Course Checkout */}
       {isCheckoutOpen && selectedCourse ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/60 px-4 py-10 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[2rem] bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-2xl rounded-4xl bg-white p-6 shadow-2xl">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h3 className="text-xl font-bold text-slate-900">Checkout</h3>

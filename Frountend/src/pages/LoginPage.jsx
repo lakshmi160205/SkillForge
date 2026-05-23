@@ -52,7 +52,7 @@ export function LoginPage() {
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
-      <div className="grid content-between gap-6 rounded-4xl bg-linear-to-br from-emerald-700 via-emerald-600 to-amber-400 p-7 text-white shadow-[0_28px_70px_rgba(6,95,70,0.14)]">
+      <div className="grid content-between gap-6 rounded-4xl bg-linear-to-br from-emerald-900 via-emerald-800 to-emerald-700 p-7 text-white shadow-[0_28px_70px_rgba(6,95,70,0.14)]">
         <div className="space-y-4">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/80">Welcome Back</p>
           <h2 className="text-4xl font-bold leading-tight md:text-5xl">Pick up exactly where you left off.</h2>
@@ -77,7 +77,7 @@ export function LoginPage() {
         </div>
       </div>
 
-      <form className="grid w-full gap-4 rounded-4xl border border-emerald-100 bg-white p-6 shadow-[0_28px_70px_rgba(6,95,70,0.08)] md:p-8" onSubmit={onSubmit}>
+      <form className="grid w-full gap-4 rounded-4xl border border-slate-200 bg-white p-6 shadow-[0_20px_48px_rgba(15,23,42,0.08)] md:p-8" onSubmit={onSubmit}>
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-slate-900">Login</h2>
           <p className="text-sm text-slate-500">Use the same role you chose during registration.</p>
@@ -85,13 +85,13 @@ export function LoginPage() {
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
           Email
-          <input className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none ring-emerald-200 transition focus:ring" name="email" type="email" value={form.email} onChange={onChange} required />
+          <input className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-emerald-200 transition focus:ring" name="email" type="email" value={form.email} onChange={onChange} required />
         </label>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
           Password
           <input
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none ring-emerald-200 transition focus:ring"
+            className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-emerald-200 transition focus:ring"
             name="password"
             type="password"
             value={form.password}
@@ -102,7 +102,7 @@ export function LoginPage() {
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
           Role
-          <select className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none ring-emerald-200 transition focus:ring" name="role" value={form.role} onChange={onChange}>
+          <select className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-emerald-200 transition focus:ring" name="role" value={form.role} onChange={onChange}>
             <option value="STUDENT">Student</option>
             <option value="INSTRUCTOR">Instructor</option>
             <option value="ADMIN">Admin</option>
@@ -111,7 +111,7 @@ export function LoginPage() {
 
         {error && <p className="font-semibold text-red-700">{error}</p>}
 
-        <button type="submit" className="rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70" disabled={isLoading}>
+        <button type="submit" className="sf-btn-primary rounded-full px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70" disabled={isLoading}>
           {isLoading ? "Logging in..." : "Login"}
         </button>
 

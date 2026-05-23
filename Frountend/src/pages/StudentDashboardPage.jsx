@@ -41,29 +41,63 @@ export function StudentDashboardPage() {
     }
   };
 
-  if (loading) return <p>Loading dashboard...</p>;
-  if (error) return <p className="font-semibold text-red-700">{error}</p>;
+  if (loading) {
+    return (
+      <section className="space-y-5">
+        <div className="h-36 animate-pulse rounded-3xl bg-emerald-100/70" />
+        <div className="grid gap-4 md:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="h-24 animate-pulse rounded-2xl bg-slate-200/70" />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
+        <p className="font-semibold text-red-700">{error}</p>
+      </section>
+    );
+  }
+
+  const enrollments = data?.enrollments || [];
 
   return (
     <section className="space-y-6">
-      <h1 className="text-3xl font-bold text-slate-900">Student Dashboard</h1>
-      {retryMessage ? <p className="font-semibold text-green-700">{retryMessage}</p> : null}
+      <article className="overflow-hidden rounded-4xl border border-emerald-100 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+        <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-700 px-6 py-8 text-white md:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">Student Workspace</p>
+          <h1 className="mt-2 text-3xl font-bold md:text-4xl">Track your progress and keep learning momentum</h1>
+          <p className="mt-2 max-w-2xl text-sm text-white/85 md:text-base">
+            Monitor enrollments, course completion, and payments from one focused dashboard.
+          </p>
+        </div>
+      </article>
+
+      {retryMessage ? (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+          {retryMessage}
+        </div>
+      ) : null}
+
       <div className="grid gap-4 md:grid-cols-4">
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
-          <h3 className="text-sm font-semibold text-slate-500">Enrolled</h3>
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
+          <h3 className="text-sm font-semibold text-slate-500">Enrolled Courses</h3>
           <p className="text-3xl font-bold text-emerald-800">{data?.totalEnrolledCourses || 0}</p>
         </article>
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Completed</h3>
           <p className="text-3xl font-bold text-emerald-800">{data?.completedCourses || 0}</p>
         </article>
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Reviews</h3>
           <p className="text-3xl font-bold text-emerald-800">{data?.reviews?.length || 0}</p>
         </article>
         <Link
           to="/student/transactions"
-          className="group flex items-center justify-between gap-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5 transition hover:border-emerald-300 hover:bg-emerald-50"
+          className="group flex items-center justify-between gap-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition hover:border-emerald-300 hover:bg-emerald-50"
         >
           <div>
             <h3 className="text-sm font-semibold text-slate-500">Transactions</h3>
@@ -73,9 +107,15 @@ export function StudentDashboardPage() {
         </Link>
       </div>
 
-      <h2 className="text-2xl font-bold text-slate-900">My Courses</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-2xl font-bold text-slate-900">My Courses</h2>
+        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+          {enrollments.length} active
+        </span>
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {(data?.enrollments || []).map((item) => {
+        {enrollments.map((item) => {
           const course = item.courseId;
           const progress = Math.max(0, Math.min(100, item.progressPercentage || 0));
           const isCompleted = progress === 100;
@@ -147,7 +187,7 @@ export function StudentDashboardPage() {
         })}
       </div>
 
-      {!(data?.enrollments || []).length && (
+      {!enrollments.length && (
         <div className="rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center">
           <p className="text-base font-semibold text-slate-700">No enrolled courses yet</p>
           <p className="mt-1 text-sm text-slate-500">Enroll in a course to start learning and track progress here.</p>

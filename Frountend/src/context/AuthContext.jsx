@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo, useState } from "react";
-import { api, setAuthToken } from "../services/api.js";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { api, setAuthToken, setUnauthorizedHandler } from "../services/api.js";
 
 const AuthContext = createContext(null);
 
@@ -58,6 +58,16 @@ export function AuthProvider({ children }) {
       saveSession("", null);
     }
   };
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      saveSession("", null);
+    });
+
+    return () => {
+      setUnauthorizedHandler(null);
+    };
+  }, []);
 
   const value = useMemo(
     () => ({

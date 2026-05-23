@@ -23,6 +23,23 @@ export function HomePage() {
     { label: "Admins can monitor users, courses, and platform activity", value: "Admin Control" },
   ];
 
+  const topCategories = ["Programming", "Data Science", "Design", "Business", "Marketing", "Personal Development"];
+
+  const platformHighlights = [
+    {
+      title: "Learn from practical courses",
+      description: "Discover job-relevant lessons that move from basics to applied projects.",
+    },
+    {
+      title: "Study at your pace",
+      description: "Watch lectures anytime and continue progress from your personal dashboard.",
+    },
+    {
+      title: "Track outcomes clearly",
+      description: "Measure progress, completion, ratings, and engagement in one place.",
+    },
+  ];
+
   useEffect(() => {
     const loadCourses = async () => {
       setLoading(true);
@@ -50,59 +67,86 @@ export function HomePage() {
 
   return (
     <section className="space-y-6">
-      <div className="grid gap-5 rounded-4xl border border-emerald-100 bg-white px-6 py-7 shadow-[0_28px_70px_rgba(6,95,70,0.08)] md:grid-cols-[1.3fr_0.7fr] md:px-8">
-          <div className="grid gap-5">
-            <p className="rounded-2xl w-67 bg-emerald-700 text-xs px-4 py-2 font-bold tracking-[0.22em] text-white uppercase">Online Learning Platform</p>
-            <h1 className="max-w-3xl text-4xl font-bold leading-tight text-slate-900 md:text-6xl">
-              Learn with a cleaner path from discovery to completion.
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-slate-600 md:text-lg">
-              Browse courses, enroll faster, and move between student, instructor, and admin workflows without getting lost in the interface.
-            </p>
+      <div className="grid gap-5 overflow-hidden rounded-4xl border border-emerald-100 bg-white shadow-[0_30px_75px_rgba(6,95,70,0.08)] md:grid-cols-[1.2fr_0.8fr] sf-animate-enter">
+        <div className="grid gap-5 bg-linear-to-br from-emerald-900 via-emerald-800 to-emerald-700 px-6 py-8 text-white md:px-8">
+          <p className="w-fit rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/85">
+            Online Learning Marketplace
+          </p>
+          <h1 className="max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
+            Gain in-demand skills with expert-led online courses.
+          </h1>
+          <p className="max-w-2xl text-base leading-7 text-white/85">
+            Explore published courses, compare by level and category, and jump into a personalized learning journey.
+          </p>
 
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  const redirectPath = isAuthenticated
-                    ? dashboardPathByRole[role] || "/login"
-                    : "/login";
-                  navigate(redirectPath);
-                }}
-                className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
-              >
-                Start learning
-              </button>
-            </div>
-
-            <div className="relative max-w-2xl">
+          <div className="max-w-2xl rounded-full border border-white/25 bg-white p-1.5">
+            <div className="flex items-center gap-2">
               <input
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-32 text-sm outline-none ring-emerald-200 transition focus:ring"
+                className="h-11 w-full rounded-full bg-transparent px-5 text-sm text-slate-800 outline-none ring-emerald-300 transition focus:ring"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search by title, subtitle, or tag"
+                placeholder="Search for anything"
               />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-full  px-3 py-1 text-xs font-semibold text-emerald-800">
+              <span className="inline-flex h-10 shrink-0 items-center rounded-full bg-emerald-700 px-5 text-sm font-semibold text-white">
                 Search
               </span>
             </div>
           </div>
 
-          <div className="grid gap-3 rounded-3xl bg-linear-to-br from-emerald-700 via-emerald-600 to-amber-400 p-5 text-white shadow-xl shadow-emerald-900/15">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/80">About The Website</p>
-            <p className="max-w-sm text-sm leading-6 text-white/90">
-              SkillForge is an online learning platform where students discover courses, instructors publish teaching content, and admins manage the system from one connected interface.
-            </p>
-            <div className="grid gap-3">
-              {featuredStats.map((item) => (
-                <div key={item.label} className="rounded-2xl bg-white/14 p-4 backdrop-blur-sm">
-                  <p className="text-2xl font-bold">{item.value}</p>
-                  <p className="mt-1 text-sm text-white/85">{item.label}</p>
-                </div>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                const redirectPath = isAuthenticated
+                  ? dashboardPathByRole[role] || "/login"
+                  : "/login";
+                navigate(redirectPath);
+              }}
+              className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50"
+            >
+              Start learning
+            </button>
+            <Link to="/categories" className="rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15">
+              Browse categories
+            </Link>
           </div>
+        </div>
+
+        <div className="grid gap-3 bg-emerald-50/70 p-6 md:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-800">Platform Overview</p>
+          <p className="max-w-sm text-sm leading-6 text-slate-600">
+            SkillForge is an online learning platform where students discover courses, instructors publish teaching content, and admins manage the system from one connected interface.
+          </p>
+          <div className="grid gap-3">
+            {featuredStats.map((item) => (
+              <div key={item.label} className="rounded-2xl border border-emerald-100 bg-white p-4">
+                <p className="text-xl font-bold text-slate-900">{item.value}</p>
+                <p className="mt-1 text-sm text-slate-600">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      <section className="space-y-3 rounded-3xl border border-emerald-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.06)] sf-animate-enter-delay-1">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-2xl font-bold text-slate-900">Top Categories</h2>
+          <Link to="/categories" className="text-sm font-semibold text-emerald-800 hover:text-emerald-900">
+            View all categories
+          </Link>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {topCategories.map((category) => (
+            <Link
+              key={category}
+              to={`/categories?category=${encodeURIComponent(category)}`}
+              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-800"
+            >
+              {category}
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
@@ -122,39 +166,64 @@ export function HomePage() {
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {courses.map((course) => (
-          <article key={course._id} className="group grid gap-2 rounded-3xl border border-emerald-100 bg-white p-3 shadow-[0_18px_40px_rgba(6,95,70,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(6,95,70,0.12)]">
+          <article key={course._id} className="group grid gap-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sf-hover-lift sf-animate-enter-delay-2">
             {course.thumbnailUrl ? (
               <img
                 src={course.thumbnailUrl}
                 alt={`${course.title} thumbnail`}
-                className="h-36 w-full rounded-2xl object-cover"
+                className="h-40 w-full object-cover"
               />
             ) : (
-              <div className="grid h-36 w-full place-items-center rounded-2xl bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <div className="grid h-40 w-full place-items-center bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 No Thumbnail
               </div>
             )}
-            <div className="flex flex-wrap gap-1.5">
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">{course.category}</span>
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">{course.level}</span>
-            </div>
-            <h3 className="text-base font-bold text-slate-900">{course.title}</h3>
-            <p className="line-clamp-2 text-xs leading-5 text-slate-600">{course.subtitle || course.description}</p>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs text-slate-500">By {course.instructorId?.firstName || "Instructor"}</p>
-              <div className="flex gap-1.5">
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{course.totalEnrollments || 0} enrolled</span>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{course.averageRating || 0} / 5</span>
+            <div className="grid gap-2 p-4">
+              <div className="flex flex-wrap gap-1.5">
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">{course.category}</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-700">{course.level}</span>
               </div>
+              <h3 className="line-clamp-2 text-base font-bold text-slate-900">{course.title}</h3>
+              <p className="line-clamp-2 text-xs leading-5 text-slate-600">{course.subtitle || course.description}</p>
+              <p className="text-xs text-slate-500">By {course.instructorId?.firstName || "Instructor"}</p>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-amber-700">{course.averageRating || 0} / 5</span>
+                <span className="text-xs text-slate-500">{course.totalEnrollments || 0} enrolled</span>
+              </div>
+              <p className="text-lg font-bold text-slate-900">
+                {course.price > 0 ? `Rs.${course.price}` : "Free"}
+              </p>
+              <Link className="sf-btn-primary rounded-xl px-4 py-2 text-center text-sm font-semibold transition" to={`/courses/${course._id}`}>
+                View Course
+              </Link>
             </div>
-            <Link className="rounded-xl bg-emerald-700 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-emerald-800" to={`/courses/${course._id}`}>
-              View Course
-            </Link>
           </article>
         ))}
       </div>
+
+      <section className="grid gap-4 md:grid-cols-3 sf-animate-enter-delay-2">
+        {platformHighlights.map((highlight) => (
+          <article key={highlight.title} className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
+            <h3 className="text-lg font-bold text-slate-900">{highlight.title}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{highlight.description}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="rounded-4xl border border-emerald-100 bg-linear-to-r from-white to-emerald-50 p-6 shadow-[0_10px_24px_rgba(15,23,42,0.06)] sf-animate-enter-delay-3">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">For Instructors</p>
+            <h3 className="mt-1 text-2xl font-bold text-slate-900">Share your knowledge with learners worldwide</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Create engaging lessons, publish your course, and grow your impact through SkillForge.</p>
+          </div>
+          <Link to="/teach" className="sf-btn-primary w-fit rounded-full px-5 py-3 text-sm font-semibold transition">
+            Start teaching
+          </Link>
+        </div>
+      </section>
     </section>
   );
 }

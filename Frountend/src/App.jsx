@@ -8,8 +8,11 @@ import { InstructorCourseDetailsPage } from "./pages/InstructorCourseDetailsPage
 import { InstructorDashboardPage } from "./pages/InstructorDashboardPage.jsx";
 import { LoginPage } from "./pages/LoginPage.jsx";
 import { RegisterPage } from "./pages/RegisterPage.jsx";
+import { CategoriesPage } from "./pages/CategoriesPage.jsx";
+import { TeachPage } from "./pages/TeachPage.jsx";
 import { StudentDashboardPage } from "./pages/StudentDashboardPage.jsx";
 import { StudentCourseLecturesPage } from "./pages/StudentCourseLecturesPage.jsx";
+import { StudentProfilePage } from "./pages/StudentProfilePage.jsx";
 import { StudentTransactionsPage } from "./pages/StudentTransactionsPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
 
@@ -18,6 +21,8 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/teach" element={<TeachPage />} />
         <Route path="/courses/:courseId" element={<CourseDetailsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -45,6 +50,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["STUDENT"]}>
               <StudentTransactionsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/profile"
+          element={
+            <ProtectedRoute allowedRoles={["STUDENT"]}>
+              <StudentProfilePage />
             </ProtectedRoute>
           }
         />

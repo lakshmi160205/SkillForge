@@ -7,6 +7,8 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
+let unauthorizedHandler = null;
+
 export const setAuthToken = (token) => {
   if (token) {
     apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
@@ -15,10 +17,24 @@ export const setAuthToken = (token) => {
   }
 };
 
+export const setUnauthorizedHandler = (handler) => {
+  unauthorizedHandler = typeof handler === "function" ? handler : null;
+};
+
 const storedToken = localStorage.getItem("token");
 if (storedToken) {
   setAuthToken(storedToken);
 }
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401 && unauthorizedHandler) {
+      unauthorizedHandler(error);
+    }
+    return Promise.reject(error);
+  },
+);
 
 export const api = {
   register: (payload) => apiClient.post("/common-api/register", payload),
@@ -29,6 +45,7 @@ export const api = {
   getCourseById: (courseId) => apiClient.get(`/common-api/courses/${courseId}`),
 
   getStudentDashboard: () => apiClient.get("/student-api/dashboard"),
+  getStudentProfile: () => apiClient.get("/student-api/profile"),
   getStudentCourseProgress: (courseId) => apiClient.get(`/student-api/courses/${courseId}/progress`),
   enrollCourse: (courseId) => apiClient.post(`/student-api/courses/${courseId}/enroll`),
   createPaymentOrder: (courseId, courseIds) =>

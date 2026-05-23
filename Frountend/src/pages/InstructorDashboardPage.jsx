@@ -247,24 +247,32 @@ export function InstructorDashboardPage() {
 
   return (
     <section className="space-y-6">
-      <h1 className="text-3xl font-bold text-slate-900">Instructor Dashboard</h1>
+      <article className="overflow-hidden rounded-4xl border border-emerald-100 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+        <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-700 px-6 py-8 text-white md:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">Instructor Studio</p>
+          <h1 className="mt-2 text-3xl font-bold md:text-4xl">Build, publish, and scale your courses</h1>
+          <p className="mt-2 max-w-2xl text-sm text-white/85 md:text-base">
+            Manage content pipeline from draft lectures to published learning experiences.
+          </p>
+        </div>
+      </article>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Total Courses</h3>
           <p className="text-3xl font-bold text-emerald-800">{dashboard?.totalCourses || 0}</p>
         </article>
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Published</h3>
           <p className="text-3xl font-bold text-emerald-800">{dashboard?.publishedCourses || 0}</p>
         </article>
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Total Students</h3>
           <p className="text-3xl font-bold text-emerald-800">{dashboard?.totalStudents || 0}</p>
         </article>
       </div>
 
-      <form className="grid gap-3 rounded-2xl border border-emerald-100 bg-white p-6 shadow-lg shadow-emerald-950/5" onSubmit={onSubmit}>
+      <form className="grid gap-3 rounded-2xl border border-emerald-100 bg-white p-6 shadow-[0_10px_24px_rgba(15,23,42,0.06)]" onSubmit={onSubmit}>
         <h2 className="text-2xl font-bold text-slate-900">Create Course</h2>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
@@ -469,7 +477,7 @@ export function InstructorDashboardPage() {
         {error && <p className="font-semibold text-red-700">{error}</p>}
         {message && <p className="font-semibold text-green-700">{message}</p>}
 
-        <button type="submit" className="w-fit rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800">
+        <button type="submit" className="sf-btn-primary w-fit rounded-lg px-3 py-2 text-sm font-semibold transition">
           Create Course
         </button>
       </form>

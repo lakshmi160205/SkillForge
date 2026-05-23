@@ -84,18 +84,26 @@ export function AdminDashboardPage() {
 
   return (
     <section className="space-y-6">
-      <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
+      <article className="overflow-hidden rounded-4xl border border-emerald-100 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+        <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-700 px-6 py-8 text-white md:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">Admin Control Center</p>
+          <h1 className="mt-2 text-3xl font-bold md:text-4xl">Platform health and user governance</h1>
+          <p className="mt-2 max-w-2xl text-sm text-white/85 md:text-base">
+            View users, manage access, and audit enrollment activity from one dashboard.
+          </p>
+        </div>
+      </article>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Total Users</h3>
           <p className="text-3xl font-bold text-emerald-800">{dashboard?.totalUsers || 0}</p>
         </article>
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Total Courses</h3>
           <p className="text-3xl font-bold text-emerald-800">{dashboard?.totalCourses || 0}</p>
         </article>
-        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-950/5">
+        <article className="grid gap-1 rounded-2xl border border-emerald-100 bg-white p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <h3 className="text-sm font-semibold text-slate-500">Total Enrollments</h3>
           <p className="text-3xl font-bold text-emerald-800">{dashboard?.totalEnrollments || 0}</p>
         </article>
@@ -104,9 +112,9 @@ export function AdminDashboardPage() {
       {/* STUDENTS SECTION */}
       <article className="space-y-4">
         <h2 className="text-2xl font-bold text-slate-900">Students</h2>
-        <div className="overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-lg shadow-emerald-950/5">
+        <div className="overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <table className="w-full border-collapse">
-            <thead className="bg-emerald-50">
+            <thead className="bg-emerald-50/70">
               <tr className="text-left text-xs uppercase tracking-wide text-emerald-800">
                 <th className="p-3">Name</th>
                 <th className="p-3">Email</th>
@@ -120,7 +128,11 @@ export function AdminDashboardPage() {
                   <tr key={user._id} className="border-t border-slate-100 text-sm text-slate-700 hover:bg-slate-50">
                     <td className="p-3">{getDisplayName(user)}</td>
                     <td className="p-3">{user.email}</td>
-                    <td className="p-3">{user.isActive ? "Active" : "Blocked"}</td>
+                    <td className="p-3">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${user.isActive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+                        {user.isActive ? "Active" : "Blocked"}
+                      </span>
+                    </td>
                     <td className="p-3 flex gap-2">
                       <button
                         className="rounded-lg border border-blue-200 bg-white px-3 py-1.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-50"
@@ -154,9 +166,9 @@ export function AdminDashboardPage() {
       {/* INSTRUCTORS SECTION */}
       <article className="space-y-4">
         <h2 className="text-2xl font-bold text-slate-900">Instructors</h2>
-        <div className="overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-lg shadow-emerald-950/5">
+        <div className="overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
           <table className="w-full border-collapse">
-            <thead className="bg-emerald-50">
+            <thead className="bg-emerald-50/70">
               <tr className="text-left text-xs uppercase tracking-wide text-emerald-800">
                 <th className="p-3">Name</th>
                 <th className="p-3">Email</th>
@@ -170,7 +182,11 @@ export function AdminDashboardPage() {
                   <tr key={user._id} className="border-t border-slate-100 text-sm text-slate-700 hover:bg-slate-50">
                     <td className="p-3">{getDisplayName(user)}</td>
                     <td className="p-3">{user.email}</td>
-                    <td className="p-3">{user.isActive ? "Active" : "Blocked"}</td>
+                    <td className="p-3">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${user.isActive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+                        {user.isActive ? "Active" : "Blocked"}
+                      </span>
+                    </td>
                     <td className="p-3 flex gap-2">
                       <button
                         className="rounded-lg border border-purple-200 bg-white px-3 py-1.5 text-xs font-semibold text-purple-700 transition hover:bg-purple-50"
