@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const BASE_URL =
-  "http://localhost:5000/student-api/cart";
+const BASE_URL = "https://skillforge-7yrt.onrender.com/student-api/cart";
 
 export const getCartAPI = async (token) => {
   const response = await axios.get(BASE_URL, {

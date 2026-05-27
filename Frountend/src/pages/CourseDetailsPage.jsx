@@ -41,7 +41,7 @@ export function CourseDetailsPage() {
         setCourseData(data.payload);
       } catch (err) {
         if (err.code === "ERR_NETWORK") {
-          setLoadError("Cannot reach backend server at http://localhost:5000. Start Backend and try again.");
+          setLoadError("Cannot reach the deployed backend server. Check the backend URL and try again.");
         } else {
           setLoadError(err.response?.data?.message || "Failed to fetch course");
         }

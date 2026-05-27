@@ -42,7 +42,7 @@ export function LoginPage() {
       }
 
       if (err.code === "ERR_NETWORK") {
-        setError("Cannot reach server. Start backend on http://localhost:5000 and try again.");
+        setError("Cannot reach the backend server. Check the deployed backend URL and try again.");
         return;
       }
 
