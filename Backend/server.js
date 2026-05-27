@@ -51,7 +51,14 @@ if (!fs.existsSync(uploadsDir)) {
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:5174"];
+      const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || "http://localhost:5174")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      // Log allowed origins for debugging in deployed environments
+      // (will only log to server console)
+      console.log("Allowed CORS origins:", allowedOrigins);
       const isLocalhost = typeof origin === "string" && /^http:\/\/localhost:\d+$/.test(origin);
 
       // Allow server-to-server calls (no Origin), configured origin, and local Vite ports.
