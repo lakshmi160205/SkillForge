@@ -60,9 +60,10 @@ app.use(
       // (will only log to server console)
       console.log("Allowed CORS origins:", allowedOrigins);
       const isLocalhost = typeof origin === "string" && /^http:\/\/localhost:\d+$/.test(origin);
+      const isVercelHost = typeof origin === "string" && /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin);
 
-      // Allow server-to-server calls (no Origin), configured origin, and local Vite ports.
-      if (!origin || allowedOrigins.includes(origin) || isLocalhost) {
+      // Allow server-to-server calls (no Origin), configured origins, local Vite ports, and Vercel deploys.
+      if (!origin || allowedOrigins.includes(origin) || isLocalhost || isVercelHost) {
         callback(null, true);
         return;
       }
