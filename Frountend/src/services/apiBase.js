@@ -1,14 +1,13 @@
-const DEFAULT_API_BASE_URL = "https://skillforge-7yrt.onrender.com";
-
-const isLocalhostUrl = (value) => typeof value === "string" && /^https?:\/\/localhost(?::\d+)?(?:\/|$)/i.test(value);
+const isLocalhostUrl = (value) =>
+  typeof value === "string" && /^https?:\/\/localhost(?::\d+)?(?:\/|$)/i.test(value);
 
 export const resolveApiBaseUrl = () => {
-  const configuredBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  // Primary env name: VITE_API_URL (set in Vercel). Keep VITE_API_BASE_URL as fallback for older setups.
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
   const isLocalDev = typeof window !== "undefined" && /^localhost$/i.test(window.location.hostname);
 
-  if (configuredBaseUrl && (!isLocalhostUrl(configuredBaseUrl) || isLocalDev)) {
-    return configuredBaseUrl;
-  }
+  if (envUrl && (!isLocalhostUrl(envUrl) || isLocalDev)) return envUrl;
 
-  return DEFAULT_API_BASE_URL;
+  // Last resort fallback to the deployed backend URL
+  return "https://skillforge-7yrt.onrender.com";
 };
