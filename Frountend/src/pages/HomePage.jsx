@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { api } from "../services/api.js";
+import { mediaUrl } from "../services/media.js";
 
 const dashboardPathByRole = {
   STUDENT: "/student/dashboard",
@@ -171,7 +172,7 @@ export function HomePage() {
           <article key={course._id} className="group grid gap-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sf-hover-lift sf-animate-enter-delay-2">
             {course.thumbnailUrl ? (
               <img
-                src={course.thumbnailUrl}
+                src={mediaUrl(course.thumbnailUrl)}
                 alt={`${course.title} thumbnail`}
                 className="h-40 w-full object-cover"
               />

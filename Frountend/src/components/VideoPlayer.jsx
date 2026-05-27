@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { mediaUrl } from "../services/media.js";
 
 export function VideoPlayer({ video, onClose }) {
   const [error, setError] = useState("");
@@ -21,7 +22,7 @@ export function VideoPlayer({ video, onClose }) {
             </div>
           ) : (
             <video controls className="h-full w-full" onError={() => setError("Failed to load video")}>
-              <source src={video.videoUrl} type="video/mp4" />
+              <source src={mediaUrl(video.videoUrl)} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           )}

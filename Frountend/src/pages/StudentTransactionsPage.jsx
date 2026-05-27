@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../services/api.js";
+import { mediaUrl } from "../services/media.js";
 
 export function StudentTransactionsPage() {
   const [transactions, setTransactions] = useState([]);
@@ -129,9 +130,9 @@ export function StudentTransactionsPage() {
                   >
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        {transaction.courseId?.thumbnailUrl ? (
+                          {transaction.courseId?.thumbnailUrl ? (
                           <img
-                            src={transaction.courseId.thumbnailUrl}
+                            src={mediaUrl(transaction.courseId.thumbnailUrl)}
                             alt={transaction.courseId.title}
                             className="h-10 w-10 rounded-lg object-cover"
                           />

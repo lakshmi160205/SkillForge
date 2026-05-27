@@ -6,6 +6,7 @@ import { CheckoutForm } from "../components/CheckoutForm.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import { api } from "../services/api.js";
+import { mediaUrl } from "../services/media.js";
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
@@ -252,7 +253,7 @@ export function CourseDetailsPage() {
               <div className="space-y-5 rounded-3xl bg-white px-5 py-5 text-slate-900 shadow-lg shadow-emerald-950/10">
                 {course.thumbnailUrl ? (
                   <img
-                    src={course.thumbnailUrl}
+                    src={mediaUrl(course.thumbnailUrl)}
                     alt={`${course.title} thumbnail`}
                     className="h-48 w-full rounded-2xl object-cover"
                   />

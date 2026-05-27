@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../services/api.js";
+import { mediaUrl } from "../services/media.js";
 
 const categoryOptions = [
   "Programming",
@@ -83,7 +84,7 @@ export function CategoriesPage() {
             >
               {course.thumbnailUrl ? (
                 <img
-                  src={course.thumbnailUrl}
+                  src={mediaUrl(course.thumbnailUrl)}
                   alt={`${course.title} thumbnail`}
                   className="h-40 w-full object-cover"
                 />

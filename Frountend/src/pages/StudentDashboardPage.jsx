@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../services/api.js";
+import { mediaUrl } from "../services/media.js";
 
 export function StudentDashboardPage() {
   const [data, setData] = useState(null);
@@ -129,7 +130,7 @@ export function StudentDashboardPage() {
               {course?.thumbnailUrl ? (
                 <div className="relative overflow-hidden rounded-2xl">
                   <img
-                    src={course.thumbnailUrl}
+                    src={mediaUrl(course.thumbnailUrl)}
                     alt={`${course.title} thumbnail`}
                     className="h-40 w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                   />

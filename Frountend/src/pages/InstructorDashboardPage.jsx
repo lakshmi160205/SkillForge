@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../services/api.js";
+import { mediaUrl } from "../services/media.js";
 
 const initialForm = {
   title: "",
@@ -494,7 +495,7 @@ export function InstructorDashboardPage() {
           >
             {course.thumbnailUrl ? (
               <img
-                src={course.thumbnailUrl}
+                src={mediaUrl(course.thumbnailUrl)}
                 alt={`${course.title} thumbnail`}
                 className="h-36 w-full rounded-xl object-cover"
               />
@@ -555,7 +556,7 @@ export function InstructorDashboardPage() {
             >
               {course.thumbnailUrl ? (
                 <img
-                  src={course.thumbnailUrl}
+                  src={mediaUrl(course.thumbnailUrl)}
                   alt={`${course.title} thumbnail`}
                   className="h-36 w-full rounded-xl object-cover"
                 />

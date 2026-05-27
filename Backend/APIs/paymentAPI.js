@@ -7,10 +7,10 @@ import { CourseModel } from "../models/CourseModel.js";
 import { EnrollmentModel } from "../models/EnrollmentModel.js";
 
 const getStripeClient = () => {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return null;
-  }
-  return new Stripe(process.env.STRIPE_SECRET_KEY);
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return null;
+  // specify API version to avoid runtime incompatibilities
+  return new Stripe(key, { apiVersion: "2022-11-15" });
 };
 
 export const paymentRoute = exp.Router();
@@ -92,10 +92,7 @@ paymentRoute.post("/create-order", async (req, res, next) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInPaise,
       currency: "inr",
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: "never",
-      },
+      payment_method_types: ["card"],
       metadata: {
         studentId: studentId.toString(),
         courseId: paymentCourseId.toString(),

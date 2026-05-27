@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../services/api.js";
+import { mediaUrl } from "../services/media.js";
 
 export function StudentCourseLecturesPage() {
   const { courseId } = useParams();
@@ -177,7 +178,7 @@ export function StudentCourseLecturesPage() {
           <div className="space-y-3">
             <h3 className="text-lg font-bold text-slate-900">Now Playing: {selectedLecture.title}</h3>
             <video key={selectedLectureId} controls onEnded={onVideoEnded} className="aspect-video w-full rounded-2xl bg-black">
-              <source src={selectedLecture.videoUrl} type="video/mp4" />
+                      <source src={mediaUrl(selectedLecture.videoUrl)} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
 
