@@ -165,6 +165,39 @@ export function CourseDetailsPage() {
     }
   };
 
+  const handlePayAndEnroll = async () => {
+  if (!course) return;
+
+  if (needsLogin) {
+    setActionError("Please login first.");
+    return;
+  }
+
+  if (!canUseCart) {
+    setActionError("Only students can purchase courses.");
+    return;
+  }
+
+  try {
+    setActionError("");
+    setMessage("");
+
+    // add only if not already in cart
+    if (!isInCart) {
+      await addToCart(course._id);
+    }
+
+    // navigate to cart page
+    navigate("/cart");
+
+  } catch (err) {
+    setActionError(
+      err.response?.data?.message ||
+      "Failed to proceed to cart"
+    );
+  }
+};
+
   const goToCourseLectures = () => {
     navigate(`/student/courses/${courseId}/lectures`);
   };
@@ -307,12 +340,12 @@ export function CourseDetailsPage() {
                     </button>
                   ) : course.price > 0 ? (
                     <button
-                      className="w-full rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
-                      type="button"
-                      onClick={openCheckout}
-                    >
-                      Pay & Enroll
-                    </button>
+  className="w-full rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+  type="button"
+  onClick={handlePayAndEnroll}
+>
+  Pay & Enroll
+</button>
                   ) : (
                     <button
                       className="w-full rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
