@@ -17,6 +17,28 @@ import cartRoutes from "./APIs/CartAPI.js";
 
 config();
 
+const normalizeMongoUrl = (value) => {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  let normalized = value.trim();
+
+  if (normalized.startsWith('"') && normalized.endsWith('"')) {
+    normalized = normalized.slice(1, -1).trim();
+  }
+
+  if (normalized.startsWith("'") && normalized.endsWith("'")) {
+    normalized = normalized.slice(1, -1).trim();
+  }
+
+  if (normalized.startsWith("DB_URL=")) {
+    normalized = normalized.slice("DB_URL=".length).trim();
+  }
+
+  return normalized;
+};
+
 const app = exp();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -100,7 +122,15 @@ app.use((err, req, res, next) => {
 
 const connectDB = async () => {
   try {
-    await connect(process.env.DB_URL);
+    const dbUrl = normalizeMongoUrl(
+      process.env.DB_URL || process.env.MONGO_URI || process.env.MONGODB_URI
+    );
+
+    if (!dbUrl) {
+      throw new Error("DB connection string is missing");
+    }
+
+    await connect(dbUrl);
     console.log("DB connection success");
     app.listen(process.env.PORT || 5000, () => {
       console.log(`server started on port ${process.env.PORT || 5000}`);
