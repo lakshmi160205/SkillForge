@@ -55,10 +55,16 @@ app.use(
       const defaultOrigins = isProduction
         ? ["https://skillforge-kappa-azure.vercel.app"]
         : ["http://localhost:5174"];
-      const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || defaultOrigins.join(","))
+      const rawOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || defaultOrigins.join(","))
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
+
+      // Normalize entries: if a value looks like a bare host (no scheme), assume https://
+      const allowedOrigins = rawOrigins.map((entry) => {
+        if (/^https?:\/\//i.test(entry) || /^http:\/\/localhost(:|$)/i.test(entry)) return entry;
+        return `https://${entry}`;
+      });
 
       // Log allowed origins for debugging in deployed environments
       // (will only log to server console)
