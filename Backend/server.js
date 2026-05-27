@@ -51,7 +51,11 @@ if (!fs.existsSync(uploadsDir)) {
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || "http://localhost:5174")
+      const isProduction = process.env.NODE_ENV === "production";
+      const defaultOrigins = isProduction
+        ? ["https://skillforge-kappa-azure.vercel.app"]
+        : ["http://localhost:5174"];
+      const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || defaultOrigins.join(","))
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
