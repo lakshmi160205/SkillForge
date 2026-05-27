@@ -1,7 +1,7 @@
 import axios from "axios";
+import { resolveApiBaseUrl } from "./apiBase.js";
 
-const DEFAULT_API_BASE_URL = "https://skillforge-7yrt.onrender.com";
-const baseURL = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL;
+const baseURL = resolveApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL,
