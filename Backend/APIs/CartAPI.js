@@ -5,7 +5,7 @@ import {
   addToCartService,
   getCartService,
   removeFromCartService,
-} from "../services/cartService.js";
+} from "../services/CartService.js";
 
 const router = express.Router();
 router.use(verifyToken);
