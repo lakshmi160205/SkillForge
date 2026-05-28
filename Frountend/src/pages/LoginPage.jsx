@@ -19,6 +19,7 @@ export function LoginPage() {
     role: "STUDENT",
   });
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const onChange = (event) => {
     setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
@@ -27,6 +28,7 @@ export function LoginPage() {
   const onSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setFieldErrors({});
 
     try {
       const user = await login(form);
@@ -34,11 +36,21 @@ export function LoginPage() {
       const redirectPath = location.state?.from?.pathname || fallback;
       navigate(redirectPath, { replace: true });
     } catch (err) {
-      const message = err.response?.data?.message;
+      const resp = err.response?.data;
+      if (resp) {
+        if (resp.details && Array.isArray(resp.details)) {
+          // transform details array into a field->message map when possible
+          const map = {};
+          resp.details.forEach((d) => {
+            if (d && d.field) map[d.field] = d.message || String(d);
+          });
+          setFieldErrors(map);
+        }
 
-      if (message) {
-        setError(message);
-        return;
+        if (resp.message) {
+          setError(resp.message);
+          return;
+        }
       }
 
       if (err.code === "ERR_NETWORK") {
@@ -86,6 +98,7 @@ export function LoginPage() {
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
           Email
           <input className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-emerald-200 transition focus:ring" name="email" type="email" value={form.email} onChange={onChange} required />
+          {fieldErrors.email && <p className="text-sm font-semibold text-red-700">{fieldErrors.email}</p>}
         </label>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
@@ -98,6 +111,7 @@ export function LoginPage() {
             onChange={onChange}
             required
           />
+          {fieldErrors.password && <p className="text-sm font-semibold text-red-700">{fieldErrors.password}</p>}
         </label>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">

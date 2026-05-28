@@ -22,6 +22,7 @@ const reviewSchema = new Schema(
       type: String,
       default: "",
       trim: true,
+      maxlength: [2000, "Review comment cannot exceed 2000 characters"],
     },
   },
   {

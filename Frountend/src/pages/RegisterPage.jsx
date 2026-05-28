@@ -14,6 +14,7 @@ export function RegisterPage() {
     role: "STUDENT",
   });
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [success, setSuccess] = useState("");
 
   const onChange = (event) => {
@@ -23,6 +24,7 @@ export function RegisterPage() {
   const onSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setFieldErrors({});
     setSuccess("");
 
     try {
@@ -30,7 +32,21 @@ export function RegisterPage() {
       setSuccess("Registration successful. Please login.");
       setTimeout(() => navigate("/login"), 800);
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to register");
+      const resp = err.response?.data;
+      if (resp) {
+        if (resp.details && Array.isArray(resp.details)) {
+          const map = {};
+          resp.details.forEach((d) => {
+            if (d && d.field) map[d.field] = d.message || String(d);
+          });
+          setFieldErrors(map);
+        }
+
+        setError(resp.message || "Unable to register");
+        return;
+      }
+
+      setError("Unable to register");
     }
   };
 
@@ -42,6 +58,7 @@ export function RegisterPage() {
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
           First name
           <input className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-emerald-200 focus:ring" name="firstName" value={form.firstName} onChange={onChange} required />
+          {fieldErrors.firstName && <p className="text-sm font-semibold text-red-700">{fieldErrors.firstName}</p>}
         </label>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
@@ -52,6 +69,7 @@ export function RegisterPage() {
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
           Email
           <input className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-emerald-200 focus:ring" name="email" type="email" value={form.email} onChange={onChange} required />
+          {fieldErrors.email && <p className="text-sm font-semibold text-red-700">{fieldErrors.email}</p>}
         </label>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
@@ -64,6 +82,7 @@ export function RegisterPage() {
             onChange={onChange}
             required
           />
+          {fieldErrors.password && <p className="text-sm font-semibold text-red-700">{fieldErrors.password}</p>}
         </label>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">

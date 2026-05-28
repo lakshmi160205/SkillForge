@@ -66,16 +66,6 @@ export function HomePage() {
     return "Featured Courses";
   }, [search]);
 
-  const groupedCourses = useMemo(() => {
-    const map = {};
-    for (const c of courses || []) {
-      const key = c.category || "Uncategorized";
-      if (!map[key]) map[key] = [];
-      if (map[key].length < 2) map[key].push(c);
-    }
-    return map;
-  }, [courses]);
-
   return (
     <section className="space-y-6">
       <div className="grid gap-5 overflow-hidden rounded-4xl border border-emerald-100 bg-white shadow-[0_30px_75px_rgba(6,95,70,0.08)] md:grid-cols-[1.2fr_0.8fr] sf-animate-enter">
@@ -177,64 +167,42 @@ export function HomePage() {
         </div>
       )}
 
-      {Object.keys(groupedCourses).length ? (
-        <div className="grid gap-6">
-          {Object.entries(groupedCourses).map(([category, items]) => (
-            <section key={category} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">{category}</h3>
-                <Link
-                  to={`/categories?category=${encodeURIComponent(category)}`}
-                  className="text-sm font-medium text-emerald-700"
-                >
-                  View all
-                </Link>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {courses.map((course) => (
+          <article key={course._id} className="group grid gap-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sf-hover-lift sf-animate-enter-delay-2">
+            {course.thumbnailUrl ? (
+              <img
+                src={mediaUrl(course.thumbnailUrl)}
+                alt={`${course.title} thumbnail`}
+                className="h-40 w-full object-cover"
+              />
+            ) : (
+              <div className="grid h-40 w-full place-items-center bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                No Thumbnail
               </div>
-
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {items.map((course) => (
-                  <article key={course._id} className="group grid gap-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sf-hover-lift sf-animate-enter-delay-2">
-                    {course.thumbnailUrl ? (
-                      <img
-                        src={mediaUrl(course.thumbnailUrl)}
-                        alt={`${course.title} thumbnail`}
-                        className="h-40 w-full object-cover"
-                      />
-                    ) : (
-                      <div className="grid h-40 w-full place-items-center bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        No Thumbnail
-                      </div>
-                    )}
-                    <div className="grid gap-2 p-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">{course.category}</span>
-                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-700">{course.level}</span>
-                      </div>
-                      <h3 className="line-clamp-2 text-base font-bold text-slate-900">{course.title}</h3>
-                      <p className="line-clamp-2 text-xs leading-5 text-slate-600">{course.subtitle || course.description}</p>
-                      <p className="text-xs text-slate-500">By {course.instructorId?.firstName || "Instructor"}</p>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-semibold text-amber-700">{course.averageRating || 0} / 5</span>
-                        <span className="text-xs text-slate-500">{course.totalEnrollments || 0} enrolled</span>
-                      </div>
-                      <p className="text-lg font-bold text-slate-900">
-                        {course.price > 0 ? `Rs.${course.price}` : "Free"}
-                      </p>
-                      <Link className="sf-btn-primary rounded-xl px-4 py-2 text-center text-sm font-semibold transition" to={`/courses/${course._id}`}>
-                        View Course
-                      </Link>
-                    </div>
-                  </article>
-                ))}
+            )}
+            <div className="grid gap-2 p-4">
+              <div className="flex flex-wrap gap-1.5">
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">{course.category}</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-700">{course.level}</span>
               </div>
-            </section>
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {/* fallback: show nothing when no grouped courses */}
-        </div>
-      )}
+              <h3 className="line-clamp-2 text-base font-bold text-slate-900">{course.title}</h3>
+              <p className="line-clamp-2 text-xs leading-5 text-slate-600">{course.subtitle || course.description}</p>
+              <p className="text-xs text-slate-500">By {course.instructorId?.firstName || "Instructor"}</p>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-amber-700">{course.averageRating || 0} / 5</span>
+                <span className="text-xs text-slate-500">{course.totalEnrollments || 0} enrolled</span>
+              </div>
+              <p className="text-lg font-bold text-slate-900">
+                {course.price > 0 ? `Rs.${course.price}` : "Free"}
+              </p>
+              <Link className="sf-btn-primary rounded-xl px-4 py-2 text-center text-sm font-semibold transition" to={`/courses/${course._id}`}>
+                View Course
+              </Link>
+            </div>
+          </article>
+        ))}
+      </div>
 
       <section className="grid gap-4 md:grid-cols-3 sf-animate-enter-delay-2">
         {platformHighlights.map((highlight) => (

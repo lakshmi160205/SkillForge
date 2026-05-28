@@ -16,6 +16,8 @@ const paymentSchema = new Schema(
       type: String,
       required: [true, "Order id is required"],
       unique: true,
+      trim: true,
+      maxlength: [200, "Order id cannot exceed 200 characters"],
     },
     paymentId: {
       type: String,
@@ -31,6 +33,7 @@ const paymentSchema = new Schema(
       default: "INR",
       uppercase: true,
       trim: true,
+      maxlength: [3, "Currency code must be 3 characters"],
     },
     status: {
       type: String,

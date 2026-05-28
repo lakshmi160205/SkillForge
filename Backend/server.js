@@ -102,37 +102,48 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const status = err.status || err.statusCode || 500;
   const isProduction = process.env.NODE_ENV === "production";
 
+  // Default status and message
+  let status = err.status || err.statusCode || 500;
   let message = err.message || "Unexpected error";
   let details;
 
+  // Mongoose validation errors -> 400 Bad Request with field-level details
   if (err.name === "ValidationError") {
-    message = "Validation error";
-    details = Object.values(err.errors || {}).map((error) => error.message);
+    status = 400;
+    message = "Validation failed";
+    details = Object.entries(err.errors || {}).map(([field, e]) => ({
+      field,
+      message: e.message,
+      value: e.value,
+    }));
   }
 
-  if (err.name === "CastError") {
+  // Mongoose CastError (invalid ObjectId, number, etc.) -> 400
+  else if (err.name === "CastError") {
+    status = 400;
     message = "Invalid value for field";
-    details = err.path ? [`${err.path} is invalid`] : undefined;
+    details = [
+      {
+        field: err.path || "",
+        message: `${err.value} is not a valid value for ${err.path}`,
+      },
+    ];
   }
 
-  if (err.code === 11000) {
+  // Duplicate key (unique index) -> 409 Conflict with the offending field
+  else if (err.code === 11000 || err.codeName === "DuplicateKey") {
+    status = 409;
+    const keyValues = err.keyValue || {};
+    const fields = Object.keys(keyValues);
     message = "Duplicate value";
-    const fields = Object.keys(err.keyValue || {});
-    details = fields.map((field) => `${field} already exists`);
+    details = fields.map((field) => ({ field, message: `${field} already exists`, value: keyValues[field] }));
   }
 
   const response = { message, status };
-
-  if (details?.length) {
-    response.details = details;
-  }
-
-  if (!isProduction) {
-    response.stack = err.stack;
-  }
+  if (details) response.details = details;
+  if (!isProduction) response.stack = err.stack;
 
   console.log("err :", err);
   res.status(status).json(response);

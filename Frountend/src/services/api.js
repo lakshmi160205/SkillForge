@@ -1,7 +1,7 @@
 import axios from "axios";
-import { resolveApiBaseUrl } from "./apiBase.js";
 
-const baseURL = resolveApiBaseUrl();
+// Accept either VITE_API_BASE_URL (preferred) or VITE_API_URL for backwards compatibility
+const baseURL = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000").trim();
 
 export const apiClient = axios.create({
   baseURL,
