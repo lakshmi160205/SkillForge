@@ -58,6 +58,7 @@ const videoSchema = new Schema(
   },
   {
     timestamps: true,
+    strict: "throw",
     versionKey: false,
   },
 );

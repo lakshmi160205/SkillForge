@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../services/api.js";
 
 export function AdminDashboardPage() {
@@ -28,6 +29,8 @@ export function AdminDashboardPage() {
       setLoading(false);
     }
   };
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     load();
@@ -142,6 +145,13 @@ export function AdminDashboardPage() {
                         View Details
                       </button>
                       <button
+                        className="rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                        type="button"
+                        onClick={() => navigate(`/admin/users/${user._id}/courses`)}
+                      >
+                        View Courses
+                      </button>
+                      <button
                         className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                         type="button"
                         onClick={() => toggleUserStatus(user._id, !user.isActive)}
@@ -194,6 +204,13 @@ export function AdminDashboardPage() {
                         onClick={() => openUserDetails(user._id, "INSTRUCTOR")}
                       >
                         View Details
+                      </button>
+                      <button
+                        className="rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                        type="button"
+                        onClick={() => navigate(`/admin/users/${user._id}/courses`)}
+                      >
+                        View Courses
                       </button>
                       <button
                         className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
@@ -264,6 +281,15 @@ export function AdminDashboardPage() {
                         {(details.student || details.instructor).isActive ? "Active" : "Blocked"}
                       </span>
                     </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                      onClick={() => navigate(`/admin/users/${selectedUserId}/courses`)}
+                    >
+                      Open User Courses
+                    </button>
                   </div>
                 </section>
 

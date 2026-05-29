@@ -8,6 +8,7 @@
     "start": "nodemon server.js",
     "seed": "node seeds/seedUsers.js",
     "seed:courses": "node seeds/seedCourses.js",
+    "seed:missing-courses": "node seeds/seedMissingInstructorCourses.js",
     "seed:lectures": "node seeds/seedLectures.js",
     "fix:lectures": "node seeds/fixLectureDurations.js"
   },

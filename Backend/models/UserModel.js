@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Enforce that local-part starts with a letter (no leading digits)
+const emailPattern = /^[A-Za-z][^\s@]*@[^\s@]+\.[^\s@]+$/;
 
 const userSchema = new Schema(
   {
@@ -10,11 +11,26 @@ const userSchema = new Schema(
       trim: true,
       minlength: [2, "First name must be at least 2 characters"],
       maxlength: [50, "First name cannot exceed 50 characters"],
+      validate: {
+        validator: (v) => {
+          if (!v) return false;
+          // allow letters (including many unicode letters), spaces, hyphens and apostrophes
+          return /^[A-Za-zÀ-ÖØ-öø-ÿ' \-]+$/u.test(v);
+        },
+        message: "First name cannot contain numbers or special characters",
+      },
     },
     lastName: {
       type: String,
       trim: true,
       maxlength: [50, "Last name cannot exceed 50 characters"],
+      validate: {
+        validator: (v) => {
+          if (!v) return true; // lastName is optional
+          return /^[A-Za-zÀ-ÖØ-öø-ÿ' \-]+$/u.test(v);
+        },
+        message: "Last name cannot contain numbers or special characters",
+      },
       trim: true,
     },
     email: {

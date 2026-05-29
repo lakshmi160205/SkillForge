@@ -64,6 +64,7 @@ export function RegisterPage() {
         <label className="grid gap-1 text-sm font-semibold text-slate-700">
           Last name
           <input className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-emerald-200 focus:ring" name="lastName" value={form.lastName} onChange={onChange} />
+          {fieldErrors.lastName && <p className="text-sm font-semibold text-red-700">{fieldErrors.lastName}</p>}
         </label>
 
         <label className="grid gap-1 text-sm font-semibold text-slate-700">

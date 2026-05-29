@@ -122,6 +122,10 @@ const courseSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
     averageRating: {
       type: Number,
       default: 0,

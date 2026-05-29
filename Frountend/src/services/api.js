@@ -95,4 +95,7 @@ export const api = {
     apiClient.patch(`/admin-api/users/${userId}/status`, { isActive }),
   getStudentDetails: (studentId) => apiClient.get(`/admin-api/students/${studentId}/details`),
   getInstructorDetails: (instructorId) => apiClient.get(`/admin-api/instructors/${instructorId}/details`),
+  getUserCourses: (userId) => apiClient.get(`/admin-api/users/${userId}/courses`),
+  getAdminCourses: () => apiClient.get("/admin-api/courses"),
+  updateCourseStatus: (courseId, isBlocked) => apiClient.patch(`/admin-api/courses/${courseId}/status`, { isBlocked }),
 };

@@ -75,6 +75,23 @@ adminRoute.get("/courses", async (req, res, next) => {
   }
 });
 
+adminRoute.patch("/courses/:courseId/status", async (req, res, next) => {
+  try {
+    const { isBlocked } = req.body;
+    const updated = await CourseModel.findByIdAndUpdate(
+      req.params.courseId,
+      { isBlocked },
+      { new: true, runValidators: true },
+    ).populate("instructorId", "firstName lastName email");
+
+    if (!updated) return res.status(404).json({ message: "Course not found" });
+
+    res.status(200).json({ message: "Course status updated", payload: updated });
+  } catch (err) {
+    next(err);
+  }
+});
+
 adminRoute.get("/students/:studentId/details", async (req, res, next) => {
   try {
     const student = await UserTypeModel.findById(req.params.studentId).select("-password");
@@ -126,6 +143,51 @@ adminRoute.get("/instructors/:instructorId/details", async (req, res, next) => {
       message: "Instructor details fetched",
       payload: { instructor, courses: coursesWithEnrollments, totalEarnings },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+adminRoute.get("/users/:userId/courses", async (req, res, next) => {
+  try {
+    const user = await UserTypeModel.findById(req.params.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role === "INSTRUCTOR") {
+      const courses = await CourseModel.find({ instructorId: req.params.userId })
+        .populate("instructorId", "firstName lastName email")
+        .sort({ createdAt: -1 });
+
+      return res.status(200).json({
+        message: "Instructor courses fetched",
+        payload: { user, role: user.role, courses },
+      });
+    }
+
+    if (user.role === "STUDENT") {
+      const enrollments = await EnrollmentModel.find({ studentId: req.params.userId })
+        .populate("courseId", "title subtitle category level price thumbnailUrl isPublished isBlocked instructorId")
+        .sort({ createdAt: -1 });
+
+      const courses = enrollments
+        .filter((enrollment) => enrollment.courseId)
+        .map((enrollment) => ({
+          ...enrollment.courseId.toObject(),
+          enrollmentId: enrollment._id,
+          enrollmentStatus: enrollment.paymentStatus,
+          progressPercentage: enrollment.progressPercentage,
+          lastAccessedAt: enrollment.lastAccessedAt,
+        }));
+
+      return res.status(200).json({
+        message: "Student courses fetched",
+        payload: { user, role: user.role, courses },
+      });
+    }
+
+    return res.status(400).json({ message: "User role does not have course data" });
   } catch (err) {
     next(err);
   }

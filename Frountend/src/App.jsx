@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout.jsx";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage.jsx";
+import AdminCoursesPage from "./pages/AdminCoursesPage.jsx";
+import AdminUserCoursesPage from "./pages/AdminUserCoursesPage.jsx";
 import { CourseDetailsPage } from "./pages/CourseDetailsPage.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
 import { InstructorCourseDetailsPage } from "./pages/InstructorCourseDetailsPage.jsx";
@@ -72,6 +74,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/courses"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminCoursesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:userId/courses"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminUserCoursesPage />
             </ProtectedRoute>
           }
         />
