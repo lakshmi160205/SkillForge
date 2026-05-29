@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "seed": "node seeds/seedUsers.js",
     "seed:courses": "node seeds/seedCourses.js",
     "seed:missing-courses": "node seeds/seedMissingInstructorCourses.js",
